@@ -14,4 +14,16 @@ describe('RGBToHexTest', () => {
     it('return hex color by correct input', () => {
         expect(rgbToHexColor(0, 0, 0)).to.equal('#000000');
     });
-})
+    it('converts white to hex', () => {
+        expect(rgbToHexColor(255, 255, 255)).to.equal('#FFFFFF');
+    })
+    it('returns undefined by non-integer num', () => {
+        expect(rgbToHexColor(0.1, 2, 3)).to.equal(undefined);
+    });
+    it('returns undefined by less qrguments', () =>{
+        expect(rgbToHexColor(1,2)).to.equal(undefined);
+    });
+    it('return string color by correct input', () => {
+        expect(typeof rgbToHexColor(0, 0, 0)).to.equal('string');
+    });
+});
