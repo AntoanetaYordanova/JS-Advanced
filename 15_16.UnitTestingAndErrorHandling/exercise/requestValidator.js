@@ -7,7 +7,7 @@ function requestValidator(objInput) {
         throw new Error('Invalid request header: Invalid Method');
     }
 
-    const uriRegex = /^[a-zA-Z.0-9@#*&]+$/g;  
+    const uriRegex = /^\*$|^[a-zA-Z.0-9@#*&]+$/g;  
     
     if(!uriRegex.test(objInput.uri) || !objInput.uri){
        throw new Error('Invalid request header: Invalid URI');
@@ -36,6 +36,19 @@ function requestValidator(objInput) {
 
 module.exports = requestValidator;
 
+try {
+    requestValidator({
+        method: 'GET',
+        uri: 'svn.public.catalog',
+        version: 'HTTP/1.1',
+        message: ''
+      }
+      );
+} catch (error) {
+    console.log(error.message);
+
+}
+
 // console.log(requestValidator({
 //     method: 'GET',
 //     uri: 'svn.public.catalog',
@@ -43,7 +56,6 @@ module.exports = requestValidator;
 //     message: ''
 //   }
 //   ));
-
 // requestValidator({
 //     method: 'OPTIONS',
 //     uri: 'git.master',
