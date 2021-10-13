@@ -17,8 +17,7 @@ function solution() {
 
     function addPresent() {
         const gift = document.querySelector('input').value;
-        document.querySelector('input').value = '';
-        
+
         if(gift === ''){
             return;
         }
