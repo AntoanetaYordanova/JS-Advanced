@@ -1,0 +1,109 @@
+class ChristmasDinner {
+  constructor(budget) {
+    this.budget = budget;
+    this.dishes = [];
+    this.products = [];
+    this.guests = {};
+  }
+
+  shopping(arr) {
+    let [type, price] = arr;
+    price = Number(price);
+
+    if (this.budget < price) {
+      throw new Error('Not enough money to buy this product');
+    }
+
+    this.products.push(type);
+    this.budget -= price;
+    return `You have successfully bought ${type}!`;
+  }
+
+  recipes(recipe) {
+    const recipeName = recipe.recipeName;
+    const productsList = recipe.productsList;
+    let haveAllProducts = true;
+    productsList.forEach((p) => {
+      this.products.includes(p) ? true : false;
+    });
+
+    if (!haveAllProducts) {
+      throw new Error('We do not have this product');
+    }
+
+    this.dishes.push({ recipeName, productsList });
+    return `${recipeName} has been successfully cooked!`
+  }
+
+  inviteGuests(name, dish) {
+    
+    const matchDish = this.dishes.find(d => d.recipeName);
+    if (!matchDish) {
+        throw new Error('We do not have this dish');
+    }
+
+    
+    if(this.guests.hasOwnProperty(name)) {
+        throw new Error('This guest has already been invited');
+    }
+
+    this.guests[name] = dish;
+
+    return `You have successfully invited ${name}!`
+  }
+
+  showAttendance() {
+      const resultArr = [];
+      const guestsArr = Object.keys(this.guests);
+      guestsArr.forEach(g => {
+        const dish = this.guests[g];
+        const products = (this.dishes.find(d => {return d.recipeName === dish})).productsList;
+        let str = g + ' will eat ' + dish + ', which consists of ' + products.join(', ');
+        resultArr.push(str);
+      });
+
+      return resultArr.join('\n');
+  }
+
+  get budget() {
+    return this._budget;
+  }
+
+  set budget(num) {
+    if (num >= 0) {
+      this._budget = num;
+    } else {
+      throw new Error('The budget cannot be a negative number');
+    }
+  }
+}
+
+let dinner = new ChristmasDinner(300);
+
+dinner.shopping(['Salt', 1]);
+dinner.shopping(['Beans', 3]);
+dinner.shopping(['Cabbage', 4]);
+dinner.shopping(['Rice', 2]);
+dinner.shopping(['Savory', 1]);
+dinner.shopping(['Peppers', 1]);
+dinner.shopping(['Fruits', 40]);
+dinner.shopping(['Honey', 10]);
+
+dinner.recipes({
+    recipeName: 'Oshav',
+    productsList: ['Fruits', 'Honey']
+});
+dinner.recipes({
+    recipeName: 'Folded cabbage leaves filled with rice',
+    productsList: ['Cabbage', 'Rice', 'Salt', 'Savory']
+});
+dinner.recipes({
+    recipeName: 'Peppers filled with beans',
+    productsList: ['Beans', 'Peppers', 'Salt']
+});
+
+dinner.inviteGuests('Ivan', 'Oshav');
+dinner.inviteGuests('Petar', 'Folded cabbage leaves filled with rice');
+dinner.inviteGuests('Georgi', 'Peppers filled with beans');
+
+console.log(dinner.showAttendance());
