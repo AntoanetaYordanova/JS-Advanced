@@ -54,9 +54,11 @@ class Restaurant{
         if(Object.keys(this.menu).length === 0) {
             return 'Our menu is not ready yet, please come later...';
         } else {
+            let printArr = [];
             for(let key in this.menu) {
-                return `${key} - $ ${this.menu[key].price}`;
+                printArr.push(`${key} - $ ${this.menu[key].price}`);
             }
+            return printArr.join('\n')
         }
     }
 

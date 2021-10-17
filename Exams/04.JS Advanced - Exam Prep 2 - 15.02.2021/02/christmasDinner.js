@@ -24,7 +24,9 @@ class ChristmasDinner {
     const productsList = recipe.productsList;
     let haveAllProducts = true;
     productsList.forEach((p) => {
-      this.products.includes(p) ? true : false;
+      if(!this.products.includes(p)) {
+        haveAllProducts = false;
+      };
     });
 
     if (!haveAllProducts) {

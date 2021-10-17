@@ -1,5 +1,4 @@
 function solve() {
-    const adoptionSection = document.querySelector('#adoption ul')
 
     const body = document.querySelector('body');
     body.addEventListener('click', (ev) => {
@@ -34,9 +33,10 @@ function solve() {
     }
 
     function addPet() {
+        const adoptionSection = document.querySelector('#adoption ul');
         const inputs = Array.from(document.querySelectorAll('#container input'));
         const name = inputs[0].value;
-        const age = inputs[1].value;
+        const age = Number(inputs[1].value);
         const kind = inputs[2].value;
         const currentOwner = inputs[3].value;
         let areEmptyInputs = false;
@@ -47,13 +47,13 @@ function solve() {
             }
         });
         
-        if(areEmptyInputs || isNaN(Number(age))) {
+        if(areEmptyInputs || isNaN(age)) {
             return;
         }
 
-        const li = createEl('li', createEl('p', createEl('strong', name), ' is a ', createEl('strong', age), ' year old ', createEl('strong', kind)), createEl('span', `Owner: ${currentOwner}`), createEl('button', 'Contact with owner'));
+        const li = createEl('li', createEl('p', createEl('strong', name), ' is a ', createEl('strong', age.toString()), ' year old ', createEl('strong', kind)), createEl('span', `Owner: ${currentOwner}`), createEl('button', 'Contact with owner'));
         adoptionSection.appendChild(li);
-        inputs.forEach(i => i.value = '');
+        // inputs.forEach(i => i.value = '');
     }
 
     function newOwnerInput(ev) {
