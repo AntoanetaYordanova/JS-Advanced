@@ -1,103 +1,80 @@
-window.addEventListener('load', solve)
+window.addEventListener('load', solve);
+
 function solve() {
-    let buttonsOnArr = [];
+    document.getElementById('add').addEventListener('click', addArticle);
 
+    const buttonsStatus = new Map;
 
-    const modelInput = document.getElementById('model');
-    const yearInput = document.getElementById('year');
-    const descriptionInput = document.getElementById('description');
-    const priceInput = document.getElementById('price');
-    const tbody = document.getElementById('furniture-list');
-
-
-    let inputFields = Array.from(document.getElementsByTagName('input'));
-    inputFields.push(document.getElementsByTagName('textarea')[0]);
-    const addButton = document.getElementsByTagName('button')[0];
-    inputFields.forEach(input => {
-        input.setAttribute('required', 'true');
-    });
-
-    yearInput.setAttribute('min', '0');
-    priceInput.setAttribute('min','0');
-    addButton.addEventListener('click', addData);
-
-    function addData(ev) {
-        let model = modelInput.value;
-        let description = descriptionInput.value;
-        let year = yearInput.value;
-        let price = priceInput.value;
-
-        if(model && description && isPositiveNum(year) && isPositiveNum(price)) {
-            const trInfo = document.createElement('tr');
-            trInfo.classList.add('info');
-            const tdModel = document.createElement('td');
-            tdModel.textContent = model;
-            trInfo.appendChild(tdModel);
-            const tdPrice = document.createElement('td');
-            tdPrice.textContent = Number(price).toFixed(2);
-            trInfo.appendChild(tdPrice);
-            const tdButtons = document.createElement('td');
-            const buttonMore = document.createElement('button');
+    function newEl(type,className, ...content) {
+        const el = document.createElement(type);
     
-            let obj = {
-                button : buttonMore,
-                isOn : false
-            }
-            buttonsOnArr.push(obj);
-            buttonMore.classList.add('moreBtn');
-            buttonMore.textContent = 'More Info';
-            buttonMore.addEventListener('click', showText);
-            tdButtons.appendChild(buttonMore);
-            const buttonBuy = document.createElement('button');
-            buttonBuy.addEventListener('click', buy); 
-            buttonBuy.classList.add('buyBtn');
-            buttonBuy.textContent = 'Buy it';
-            tdButtons.appendChild(buttonBuy);
-            trInfo.appendChild(tdButtons);
-            tbody.appendChild(trInfo);
-            const trHidden = document.createElement('tr');
-            trHidden.classList.add('hide');
-            const tdYear = document.createElement('td');
-            tdYear.textContent = 'Year: \n' + year;
-            trHidden.appendChild(tdYear);
-            const tdDescription =  document.createElement('td');
-            tdDescription.colSpan = '3';
-            tdDescription.textContent = 'Description: ' +  description;
-            trHidden.appendChild(tdDescription);
-            tbody.appendChild(trHidden);
-            inputFields.forEach(input => input.value = '');
+        if(className !== undefined) {
+            el.classList.add(className);
         }
-      
+    
+            content.forEach(c => {
+                if(typeof c === 'string') {
+                    el.appendChild(document.createTextNode(c));
+                } else {
+                    el.appendChild(c);
+                }
+            });
+        return el;
     }
 
-    function showText (ev) {
-        let currentHideRow = ev.target.parentElement.parentElement.nextElementSibling;
-        let currentHideButton = ev.target.parentElement.querySelector('button');
-        let buttonInObj = (buttonsOnArr.filter(el => el.button ===  currentHideButton));
-        buttonInObj = buttonInObj[0];
-        
-        if(!buttonInObj.isOn) {
-            buttonInObj.isOn = true;
-            currentHideRow.style.display = 'contents';
-            currentHideButton.textContent = 'Less Info';
+    function addArticle(ev) {
+        ev.preventDefault();
+        const inputs = Array.from(document.querySelectorAll('form input'));
+        const descriptionInput = document.querySelector('textarea');
+
+        const model = inputs[0].value;
+        const year = Number(inputs[1].value);
+        const description = descriptionInput.value;
+        const price = Number(inputs[2].value);
+
+        if(model === '' || description === '' || year <= 0 || price <= 0) {
+            return;
+        }
+
+        const furnitureList = document.querySelector('#furniture-list');
+        const moreBtn = newEl('button', 'moreBtn', 'More Info');
+        buttonsStatus.set(moreBtn, false);
+        moreBtn.addEventListener('click', moreInfo);
+        const buyBtn = newEl('button', 'buyBtn', 'Buy it');
+        buyBtn.addEventListener('click', buy);
+
+        const trInfo = newEl('tr', 'info', newEl('td', undefined, model), newEl('td', undefined, price.toFixed(2)), newEl('td', undefined, moreBtn, buyBtn));
+        const trHidden = newEl('tr', 'hide', newEl('td', undefined, `Year: ${year}`), newEl('td', undefined, `Description: ${description}`));
+
+        furnitureList.appendChild(trInfo);
+        furnitureList.appendChild(trHidden);
+        document.querySelector('tbody tr.hide td:nth-child(2)').setAttribute('colspan', '3');
+
+        inputs.forEach(i => i.value = '');
+        descriptionInput.value = '';
+    }
+
+    function moreInfo(ev) {
+
+        if(!buttonsStatus.get(ev.target)) {
+            ev.target.textContent = 'Less Info';
+            document.querySelector('tbody tr.hide').style.display = 'contents';
+            buttonsStatus.set(ev.target, true);
         } else {
-            buttonInObj.isOn = false; 
-            currentHideRow.style.display = 'none';
-            currentHideButton.textContent = 'More Info';
+            ev.target.textContent = 'More Info';
+            document.querySelector('tbody tr.hide').style.display = 'none';
+            buttonsStatus.set(ev.target, false);
         }
+        
     }
 
-    function buy (ev){
-        let totalPriceOutput = document.getElementsByClassName('total-price')[0];
-        let priceElement = ev.target.parentElement.parentElement.querySelector('td:nth-child(2)');
-        let newPrice = (Number(priceElement.textContent) + Number(totalPriceOutput.textContent)).toFixed(2);
-        totalPriceOutput.textContent = newPrice;
-    }
-
-    function isPositiveNum(num) {
-        if(num) {
-            return  Number(num) >= 0 ? true : false;
-        }
-     
+    function buy(ev) {
+        const total = document.querySelector('tfoot td.total-price');
+        const currentValue = Number(total.textContent);
+        const newValue = Number(ev.target.parentElement.previousSibling.textContent) + currentValue;
+        total.textContent = newValue.toFixed(2);
+        ev.target.parentElement.parentElement.nextSibling.remove();
+        ev.target.parentElement.parentElement.remove();
+        
     }
 }
