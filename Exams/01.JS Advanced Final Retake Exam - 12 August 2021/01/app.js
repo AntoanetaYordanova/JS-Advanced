@@ -5,13 +5,17 @@ function solve() {
 
     const buttonsStatus = new Map;
 
-    function newEl(type,className, ...content) {
+    function newEl(type,className, attributeName, ...content) {
         const el = document.createElement(type);
     
         if(className !== undefined) {
             el.classList.add(className);
         }
-    
+        
+        if(attributeName !== undefined) {
+            const [name, value] = attributeName;
+            el.setAttribute(name, value);
+        }
             content.forEach(c => {
                 if(typeof c === 'string') {
                     el.appendChild(document.createTextNode(c));
@@ -37,18 +41,17 @@ function solve() {
         }
 
         const furnitureList = document.querySelector('#furniture-list');
-        const moreBtn = newEl('button', 'moreBtn', 'More Info');
+        const moreBtn = newEl('button', 'moreBtn', undefined,'More Info');
         buttonsStatus.set(moreBtn, false);
         moreBtn.addEventListener('click', moreInfo);
-        const buyBtn = newEl('button', 'buyBtn', 'Buy it');
+        const buyBtn = newEl('button', 'buyBtn', undefined, 'Buy it');
         buyBtn.addEventListener('click', buy);
 
-        const trInfo = newEl('tr', 'info', newEl('td', undefined, model), newEl('td', undefined, price.toFixed(2)), newEl('td', undefined, moreBtn, buyBtn));
-        const trHidden = newEl('tr', 'hide', newEl('td', undefined, `Year: ${year}`), newEl('td', undefined, `Description: ${description}`));
+        const trInfo = newEl('tr', 'info', undefined, newEl('td', undefined, undefined, model), newEl('td', undefined, undefined, price.toFixed(2)), newEl('td', undefined, undefined, moreBtn, buyBtn));
+        const trHidden = newEl('tr', 'hide', undefined, newEl('td', undefined, undefined, `Year: ${year}`), newEl('td', undefined, ['colspan', '3'], `Description: ${description}`));
 
         furnitureList.appendChild(trInfo);
         furnitureList.appendChild(trHidden);
-        document.querySelector('tbody tr.hide td:nth-child(2)').setAttribute('colspan', '3');
 
         inputs.forEach(i => i.value = '');
         descriptionInput.value = '';
@@ -58,11 +61,11 @@ function solve() {
 
         if(!buttonsStatus.get(ev.target)) {
             ev.target.textContent = 'Less Info';
-            document.querySelector('tbody tr.hide').style.display = 'contents';
+            ev.target.parentElement.parentElement.nextSibling.style.display = 'contents';
             buttonsStatus.set(ev.target, true);
         } else {
             ev.target.textContent = 'More Info';
-            document.querySelector('tbody tr.hide').style.display = 'none';
+            ev.target.parentElement.parentElement.nextSibling.style.display = 'none';
             buttonsStatus.set(ev.target, false);
         }
         
