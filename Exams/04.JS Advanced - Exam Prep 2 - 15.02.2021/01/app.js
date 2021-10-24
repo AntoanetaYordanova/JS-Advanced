@@ -1,71 +1,48 @@
 function solution() {
-    document.querySelector('.container').addEventListener('click', (ev) => {
-        const target = ev.target;
+    document.querySelector('.card button').addEventListener('click', addGift);
 
-        if(target.tagName === 'BUTTON') {
-            if(target.textContent === 'Add gift'){
-                addPresent();
-            } else if (target.textContent === 'Send'){
-                sendPresent(ev);
-            } else if (target.textContent === 'Discard'){
-                discardPresent(ev);
-            }
-        }
-    });
+    function addGift() {
+        const input = document.querySelector('.card input');
+        const gift = input.value
+        const giftsList = document.querySelector('.card:nth-child(2) ul');
+        const li = newEl('li', 'gift', gift);
+        const sendBtn = newEl('button', 'sendButton', 'Send');
+        sendBtn.addEventListener('click', sendGift);
+        li.appendChild(sendBtn);
+        const discardBtn = newEl('button', 'discardButton', 'Discard');
+        discardBtn.addEventListener('click', discardGift);
+        li.appendChild(discardBtn);
+        giftsList.appendChild(li);
 
-    let lis = new Map;
-
-    function addPresent() {
-        const gift = document.querySelector('input').value;
-        document.querySelector('input').value = '';
-        
-        if(gift === ''){
-            return;
-        }
-
-        const sendButton = createEl('button', 'Send', 'sendButton');
-        const discardButton = createEl('button', 'Discard', 'discardButton');
-        const li = createEl('li', gift, 'gift');
-        li.appendChild(sendButton);
-        li.appendChild(discardButton);
-        lis.set(li, gift);
-
-        const sorted = Array.from(lis.entries()) .sort((a, b) => a[1].localeCompare(b[1]));
-        
-        sorted.forEach(e => {
-            document.querySelector('.card:nth-child(2) ul').appendChild(e[0]);
-        });
+        const sorted = Array.from(giftsList.children).sort((a, b) => a.textContent.localeCompare(b.textContent));
+        sorted.forEach(e => giftsList.appendChild(e));
+        input.value = '';
     }
 
-    function createEl(type, content, className){
+    function sendGift(ev) {
+        const sentGifts = document.querySelector('.card:nth-child(3) ul');
+        const currentLi = ev.target.parentElement;
+        Array.from(currentLi.children).forEach(c => c.remove());
+        sentGifts.appendChild(currentLi);
+    }
+
+    function discardGift(ev) {
+        const discartedGifts = document.querySelector('.card:nth-child(4) ul');
+        const currentLi = ev.target.parentElement;
+        Array.from(currentLi.children).forEach(c => c.remove());
+        discartedGifts.appendChild(currentLi);
+    }
+
+    function newEl(type,className, content) {
         const el = document.createElement(type);
-
-        if(content !== undefined) {
-            el.textContent = content;
-        }
-
+    
         if(className !== undefined) {
             el.classList.add(className);
         }
-
+        
+        if(content !== undefined) {
+            el.appendChild(document.createTextNode(content));
+        }
         return el;
-    }
-
-    function sendPresent(ev) {
-        const gift = lis.get(ev.target.parentElement);
-        ev.target.parentElement.remove();
-        lis.delete(ev.target.parentElement);
-
-        const li = createEl('li', gift, 'gift');
-        document.querySelector('.card:nth-child(3) ul').appendChild(li);
-    }
-
-    function discardPresent(ev) {
-        const gift = lis.get(ev.target.parentElement);
-        ev.target.parentElement.remove();
-        lis.delete(ev.target.parentElement);
-
-        const li = createEl('li', gift, 'gift');
-        document.querySelector('.card:nth-child(4) ul').appendChild(li);
     }
 }
